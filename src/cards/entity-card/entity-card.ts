@@ -25,15 +25,6 @@ export class OnyxEntityCard extends OnyxBaseCard<EntityCardConfig> {
       glassCardStyles,
       glassLightDefaults,
       css`
-        :host([light-mode]) {
-          --onyx-bg-color: rgba(255, 255, 255, 0.3);
-          --onyx-border-color: rgba(0, 0, 0, 0.1);
-          --onyx-text-primary: rgba(0, 0, 0, 0.9);
-          --onyx-text-secondary: rgba(0, 0, 0, 0.55);
-          --onyx-icon-active: rgba(0, 0, 0, 0.85);
-          --onyx-icon-inactive: rgba(0, 0, 0, 0.35);
-          --onyx-glow-color: rgba(0, 0, 0, 0.04);
-        }
         .container {
           flex: 1;
           display: flex;
@@ -193,7 +184,7 @@ export class OnyxEntityCard extends OnyxBaseCard<EntityCardConfig> {
       this.hass.callService('homeassistant', 'toggle', {}, { entity_id: this._config.entity });
     } else if (action === 'navigate' && this._config.tap_action?.navigation_path) {
       history.pushState(null, '', this._config.tap_action.navigation_path);
-      fireEvent(window as unknown as HTMLElement, 'location-changed', { replace: false });
+      fireEvent(this, 'location-changed', { replace: false });
     } else {
       fireEvent(this, 'hass-more-info', { entityId: this._config.entity });
     }

@@ -5,7 +5,7 @@ export function loadHaComponents(): void {
     };
     tileCard?.getConfigElement?.();
   }
-  if (!customElements.get('ha-entity-picker')) {
+  if (!customElements.get('ha-entity-picker') || !customElements.get('ha-icon-picker')) {
     const entitiesCard = customElements.get('hui-entities-card') as unknown as {
       getConfigElement?: () => unknown;
     };

@@ -18,8 +18,7 @@ export const glassDarkDefaults = css`
 `;
 
 export const glassLightDefaults = css`
-  :host {
-    --onyx-glass-blur: 10px;
+  :host([light-mode]) {
     --onyx-bg-color: rgba(255, 255, 255, 0.3);
     --onyx-border-color: rgba(0, 0, 0, 0.1);
     --onyx-border-opacity: 0.15;
@@ -28,8 +27,6 @@ export const glassLightDefaults = css`
     --onyx-text-secondary: rgba(0, 0, 0, 0.55);
     --onyx-icon-active: rgba(0, 0, 0, 0.85);
     --onyx-icon-inactive: rgba(0, 0, 0, 0.35);
-    --onyx-radius: 16px;
-    --onyx-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --onyx-glow-color: rgba(0, 0, 0, 0.04);
   }
 `;
