@@ -1,0 +1,25 @@
+{
+  "name": "onyx-cards",
+  "version": "0.1.0",
+  "description": "Premium custom Lovelace cards for Home Assistant with liquid glass styling and proper grid integration",
+  "type": "module",
+  "main": "dist/onyx-cards.js",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite build --watch"
+  },
+  "dependencies": {
+    "home-assistant-js-websocket": "^9.6.0",
+    "lit": "^3.3.3",
+    "superstruct": "^2.0.2"
+  },
+  "devDependencies": {
+    "typescript": "^6.0.3",
+    "vite": "^8.0.13"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/oohhddaanngg/onyx-cards"
+  }
+}
