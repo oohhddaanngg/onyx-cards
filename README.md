@@ -1,6 +1,6 @@
 # Onyx Cards
 
-Premium custom Lovelace cards for Home Assistant. Liquid glass aesthetics with proper sections view grid integration — the thing nobody else has built yet.
+Premium custom Lovelace cards for Home Assistant. Liquid glass aesthetics with proper sections view grid integration - the thing nobody else has built yet.
 
 ## Why
 
