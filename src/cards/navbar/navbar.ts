@@ -43,10 +43,10 @@ export class OnyxNavbar extends OnyxBaseElement implements LovelaceCard {
           padding: 8px 16px;
           padding-bottom: max(8px, env(safe-area-inset-bottom));
           background: var(--onyx-bg-color);
-          backdrop-filter: blur(var(--onyx-glass-blur, 10px));
-          -webkit-backdrop-filter: blur(var(--onyx-glass-blur, 10px));
-          border-top: 1px solid var(--onyx-border-color, rgba(255, 255, 255, 0.2));
-          box-shadow: 0 -2px 20px rgba(0, 0, 0, 0.15);
+          backdrop-filter: var(--onyx-backdrop-filter, var(--ha-card-backdrop-filter, blur(var(--onyx-glass-blur, 10px))));
+          -webkit-backdrop-filter: var(--onyx-backdrop-filter, var(--ha-card-backdrop-filter, blur(var(--onyx-glass-blur, 10px))));
+          border-top: var(--ha-card-border-width, 1px) solid var(--onyx-border-color, rgba(255, 255, 255, 0.2));
+          box-shadow: var(--ha-card-box-shadow, 0 -2px 20px rgba(0, 0, 0, 0.15));
         }
         .nav-item {
           display: flex;
