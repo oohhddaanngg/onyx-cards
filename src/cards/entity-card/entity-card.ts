@@ -178,10 +178,9 @@ export class OnyxEntityCard extends OnyxBaseCard<EntityCardConfig> {
   }
 
   private _handleKeydown(ev: KeyboardEvent): void {
-    if (ev.repeat) return;
     if (ev.key === 'Enter') {
       ev.preventDefault();
-      this._handleTap();
+      if (!ev.repeat) this._handleTap();
     } else if (ev.key === ' ') {
       ev.preventDefault();
     }
