@@ -34,7 +34,7 @@ export class OnyxNavbar extends OnyxBaseElement implements LovelaceCard {
         .navbar {
           position: fixed;
           bottom: 0;
-          left: 0;
+          left: var(--mdc-drawer-width, 0px);
           right: 0;
           z-index: 10;
           display: flex;
