@@ -1,5 +1,5 @@
 import {
-  object,
+  type as struct,
   optional,
   string,
   number,
@@ -8,7 +8,7 @@ import {
   type Infer,
 } from 'superstruct';
 
-export const entityCardConfigStruct = object({
+export const entityCardConfigStruct = struct({
   type: string(),
   entity: optional(string()),
   name: optional(string()),

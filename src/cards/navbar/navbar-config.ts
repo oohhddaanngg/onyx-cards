@@ -1,4 +1,4 @@
-import { object, optional, string, number, array, type Infer } from 'superstruct';
+import { object, type as struct, optional, string, number, array, type Infer } from 'superstruct';
 
 export const navItemStruct = object({
   icon: string(),
@@ -6,7 +6,7 @@ export const navItemStruct = object({
   route: string(),
 });
 
-export const navbarConfigStruct = object({
+export const navbarConfigStruct = struct({
   type: string(),
   items: optional(array(navItemStruct)),
   glass_blur: optional(number()),
