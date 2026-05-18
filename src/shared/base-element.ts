@@ -1,7 +1,7 @@
 import { LitElement, type CSSResultGroup, type PropertyValues } from 'lit';
 import { property } from 'lit/decorators.js';
 import type { HomeAssistant } from '../ha/types.js';
-import { glassDarkDefaults, glassLightDefaults } from './glass-styles.js';
+import { glassDarkDefaults } from './glass-styles.js';
 
 export class OnyxBaseElement extends LitElement {
   @property({ attribute: false }) hass!: HomeAssistant;

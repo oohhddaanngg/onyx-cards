@@ -1,9 +1,8 @@
 import { state } from 'lit/decorators.js';
 import type { PropertyValues } from 'lit';
-import { html, nothing, type TemplateResult } from 'lit';
+import { html, type TemplateResult } from 'lit';
 import type {
   HassEntity,
-  HomeAssistant,
   LovelaceCard,
   LovelaceCardConfig,
   LovelaceGridOptions,
