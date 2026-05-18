@@ -149,6 +149,7 @@ export class OnyxEntityCard extends OnyxBaseCard<EntityCardConfig> {
           class="container"
           @click=${this._handleTap}
           @keydown=${this._handleKeydown}
+          @keyup=${this._handleKeyup}
           role="button"
           tabindex="0"
           aria-label=${name}
@@ -177,7 +178,17 @@ export class OnyxEntityCard extends OnyxBaseCard<EntityCardConfig> {
   }
 
   private _handleKeydown(ev: KeyboardEvent): void {
-    if (ev.key === 'Enter' || ev.key === ' ') {
+    if (ev.repeat) return;
+    if (ev.key === 'Enter') {
+      ev.preventDefault();
+      this._handleTap();
+    } else if (ev.key === ' ') {
+      ev.preventDefault();
+    }
+  }
+
+  private _handleKeyup(ev: KeyboardEvent): void {
+    if (ev.key === ' ') {
       ev.preventDefault();
       this._handleTap();
     }
