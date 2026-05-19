@@ -206,7 +206,9 @@ Theme authors can set defaults via HA theme YAML using `--onyx-*` CSS custom pro
 
 **How long is a hold?** 500ms. The device vibrates (on mobile) at the threshold to confirm the hold registered. The action fires when you release.
 
-**Why does single-tap feel delayed when I configure double-tap?** There is a 250ms window after each tap to detect whether a second tap follows. If you configure `double_tap_action`, single-tap will wait that long before firing. URL actions on tap skip this delay - `window.open` requires a synchronous user event and can't be deferred.
+**Why does single-tap feel delayed when I configure double-tap?** There is a 250ms window after each tap to detect whether a second tap follows. If you configure `double_tap_action`, single-tap will wait that long before firing.
+
+**Can I use a URL tap action with a double-tap action?** No. URL tap actions fire immediately to preserve browser user activation (required for `window.open`). When tap is a URL, the 250ms double-tap detection window does not run, so double-tap can never fire. Put the URL on `double_tap_action` and use a different action type (navigate, toggle, etc.) for tap.
 
 **Why doesn't my URL action work from the editor preview?** Browsers require a direct user gesture to open a new tab. URL actions work correctly from real taps - the editor preview is not a real gesture.
 

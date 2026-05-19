@@ -200,10 +200,10 @@ class ActionHandlerDirective extends AsyncDirective {
     }
   };
 
-  // Fallback for AT (screen readers that synthesize click without pointer events)
+  // Fallback for AT (screen readers synthesize click without pointer events)
   private _onClick = (): void => {
-    if (Date.now() - this._lastPointerUpMs < 300) return; // already handled by pointer events
-    if (!this._canceled) this._fireAction('tap');
+    if (Date.now() - this._lastPointerUpMs < 300) return; // suppress click following pointer events
+    this._fireAction('tap');
   };
 
   private _onContextMenu = (ev: MouseEvent): void => {
@@ -254,9 +254,12 @@ class ActionHandlerDirective extends AsyncDirective {
   };
 
   private _onBlur = (): void => {
-    this._canceled = true;
-    clearTimeout(this._holdTimer);
-    this._holdTimer = undefined;
+    // Only cancel if there is an active gesture - prevents stale _canceled state
+    if (this._holdTimer !== undefined || this._activePointerId !== null) {
+      this._canceled = true;
+      clearTimeout(this._holdTimer);
+      this._holdTimer = undefined;
+    }
   };
 
   disconnected(): void {
