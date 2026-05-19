@@ -6,6 +6,7 @@ import { glassLightDefaults } from '../../shared/glass-styles.js';
 import { registerCustomCard } from '../../utils/register.js';
 import { fireEvent } from '../../ha/types.js';
 import { applyGlassConfig } from '../../utils/theme.js';
+import { isRelativePath } from '../../utils/validate.js';
 import type { LovelaceCard, LovelaceGridOptions } from '../../ha/types.js';
 import { NAVBAR_NAME, NAVBAR_EDITOR_NAME } from './const.js';
 import { navbarConfigStruct, type NavbarConfig } from './navbar-config.js';
@@ -170,6 +171,7 @@ export class OnyxNavbar extends OnyxBaseElement implements LovelaceCard {
 
   private _navigate(path: string): void {
     if (window.location.pathname === path) return;
+    if (!isRelativePath(path)) return;
     history.pushState(null, '', path);
     fireEvent(this, 'location-changed', { replace: false });
     this._currentPath = path;

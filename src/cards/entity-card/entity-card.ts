@@ -5,6 +5,7 @@ import { OnyxBaseCard } from '../../shared/base-card.js';
 import { cardStyles } from '../../shared/card-styles.js';
 import { glassCardStyles, glassLightDefaults } from '../../shared/glass-styles.js';
 import { registerCustomCard } from '../../utils/register.js';
+import { isRelativePath } from '../../utils/validate.js';
 import { fireEvent, isActive, isAvailable, isToggleable } from '../../ha/types.js';
 import { ENTITY_CARD_NAME, ENTITY_CARD_EDITOR_NAME } from './const.js';
 import { entityCardConfigStruct, type EntityCardConfig } from './entity-card-config.js';
@@ -205,8 +206,11 @@ export class OnyxEntityCard extends OnyxBaseCard<EntityCardConfig> {
     if (action === 'toggle' && isToggleable(this._config.entity)) {
       this.hass.callService('homeassistant', 'toggle', {}, { entity_id: this._config.entity });
     } else if (action === 'navigate' && this._config.tap_action?.navigation_path) {
-      history.pushState(null, '', this._config.tap_action.navigation_path);
-      fireEvent(this, 'location-changed', { replace: false });
+      const navPath = this._config.tap_action.navigation_path;
+      if (typeof navPath === 'string' && isRelativePath(navPath)) {
+        history.pushState(null, '', navPath);
+        fireEvent(this, 'location-changed', { replace: false });
+      }
     } else {
       fireEvent(this, 'hass-more-info', { entityId: this._config.entity });
     }
