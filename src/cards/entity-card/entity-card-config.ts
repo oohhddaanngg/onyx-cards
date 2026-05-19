@@ -18,6 +18,7 @@ export const entityCardConfigStruct = struct({
   secondary_info: optional(string()),
   tap_action: optional(any()),
   hold_action: optional(any()),
+  double_tap_action: optional(any()),
   glass_blur: optional(boundedNumber(0, 30)),
   background_color: optional(string()),
   accent_color: optional(string()),

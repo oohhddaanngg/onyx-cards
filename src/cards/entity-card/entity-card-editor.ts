@@ -54,6 +54,7 @@ const SCHEMA: HaFormSchema[] = [
   },
   { name: 'tap_action', selector: { ui_action: {} } },
   { name: 'hold_action', selector: { ui_action: {} } },
+  { name: 'double_tap_action', selector: { ui_action: {} } },
 ];
 
 const FLAT_GLASS_SCHEMA: HaFormSchema[] = [
@@ -89,6 +90,7 @@ const SCHEMA_FALLBACK: HaFormSchema[] = [
   ...FLAT_GLASS_SCHEMA,
   { name: 'tap_action', selector: { ui_action: {} } },
   { name: 'hold_action', selector: { ui_action: {} } },
+  { name: 'double_tap_action', selector: { ui_action: {} } },
 ];
 
 const LABELS: Record<string, string> = {
@@ -105,6 +107,7 @@ const LABELS: Record<string, string> = {
   background_color: 'Card Background',
   tap_action: 'Tap Action',
   hold_action: 'Hold Action',
+  double_tap_action: 'Double Tap Action',
 };
 
 @customElement(ENTITY_CARD_EDITOR_NAME)

@@ -1,10 +1,13 @@
-import { object, type as struct, optional, string, array, type Infer } from 'superstruct';
+import { object, type as struct, optional, string, array, any, type Infer } from 'superstruct';
 import { boundedNumber } from '../../utils/validate.js';
 
 export const navItemStruct = object({
   icon: string(),
   label: optional(string()),
   route: string(),
+  tap_action: optional(any()),
+  hold_action: optional(any()),
+  double_tap_action: optional(any()),
 });
 
 export const navbarConfigStruct = struct({

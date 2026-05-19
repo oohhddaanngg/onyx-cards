@@ -17,7 +17,7 @@ type: custom:onyx-entity-card
 entity: switch.living_room
 ```
 
-Visual editor supports: entity picker, name/icon overrides, show/hide state, secondary info text, glass blur intensity, border visibility, corner radius, accent/background colors, and tap/hold actions.
+Visual editor supports: entity picker, name/icon overrides, show/hide state, secondary info text, glass blur intensity, border visibility, corner radius, accent/background colors, and tap/hold/double-tap actions.
 
 ### Navigation Bar (`custom:onyx-navbar`)
 
@@ -37,6 +37,92 @@ items:
     route: /config
 ```
 
+## Gestures
+
+All cards support three gesture types. Hold and double-tap are opt-in - configure the action to enable them.
+
+**Entity card with hold action:**
+```yaml
+type: custom:onyx-entity-card
+entity: light.bedroom
+tap_action:
+  action: toggle
+hold_action:
+  action: more-info
+```
+
+**Entity card with double-tap to activate a scene:**
+```yaml
+type: custom:onyx-entity-card
+entity: light.living_room
+tap_action:
+  action: toggle
+double_tap_action:
+  action: perform-action
+  perform_action: scene.turn_on
+  target:
+    entity_id: scene.movie_night
+```
+
+**Navbar item with hold to open more-info on a specific entity:**
+```yaml
+type: custom:onyx-navbar
+items:
+  - icon: mdi:lightbulb
+    label: Lights
+    route: /lovelace/lights
+    hold_action:
+      action: more-info
+      entity: light.bedroom
+```
+
+The `entity` field on an action config lets navbar items (which have no entity of their own) open more-info or toggle a specific entity on hold or double-tap.
+
+## Action Types
+
+| Action | Description |
+|---|---|
+| `none` | Do nothing |
+| `toggle` | Toggle the entity. Falls back to more-info if entity is not toggleable. |
+| `more-info` | Open the more-info dialog |
+| `navigate` | Navigate to a dashboard path |
+| `url` | Open a URL in a new tab |
+| `perform-action` | Call a Home Assistant service |
+| `call-service` | Legacy alias for `perform-action` (still works for existing YAML) |
+| `assist` | Open the voice assistant dialog |
+
+```yaml
+# navigate
+tap_action:
+  action: navigate
+  navigation_path: /lovelace/lights
+
+# url
+tap_action:
+  action: url
+  url_path: https://example.com
+
+# perform-action
+hold_action:
+  action: perform-action
+  perform_action: light.turn_on
+  data:
+    brightness_pct: 100
+  target:
+    entity_id: light.bedroom
+
+# call-service (legacy)
+hold_action:
+  action: call-service
+  service: light.turn_on
+  service_data:
+    brightness_pct: 100
+
+# assist
+double_tap_action:
+  action: assist
+```
+
 ## Grid Integration
 
 The core differentiator. Onyx cards return dynamic `getGridOptions()` based on content, never `rows: "auto"`. Cards always fill their grid cells with `height: 100%` and flex-stretch layouts. The stacking pattern works:
@@ -51,21 +137,84 @@ The core differentiator. Onyx cards return dynamic `getGridOptions()` based on c
 +----------------+ +----------------+
 ```
 
+## Config Reference
+
+### Entity Card
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `entity` | string | required | Entity ID |
+| `name` | string | entity name | Display name override |
+| `icon` | string | entity icon | MDI icon override |
+| `icon_color` | string | - | Icon color |
+| `show_state` | boolean | `true` | Show state text |
+| `secondary_info` | string | - | Secondary text line |
+| `tap_action` | ActionConfig | `toggle` | Tap behavior |
+| `hold_action` | ActionConfig | `more-info` | Hold behavior |
+| `double_tap_action` | ActionConfig | `none` | Double-tap behavior |
+| `glass_blur` | 0-30 | `10` | Backdrop blur in px |
+| `background_color` | string | auto | Card background |
+| `border_opacity` | 0-1 | `0.2` | Border visibility |
+| `accent_color` | string | auto | Active state accent |
+| `corner_radius` | 4-32 | `16` | Border radius in px |
+
+### Navigation Bar
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `items` | NavItem[] | `[]` | Navigation items |
+| `glass_blur` | 0-30 | `10` | Backdrop blur in px |
+| `background_color` | string | auto | Bar background |
+| `border_opacity` | 0-1 | `0.2` | Top border visibility |
+| `accent_color` | string | auto | Active item accent |
+
+**NavItem fields:**
+
+| Key | Type | Default | Description |
+|---|---|---|---|
+| `icon` | string | required | MDI icon |
+| `label` | string | - | Label text |
+| `route` | string | required | Navigation path |
+| `tap_action` | ActionConfig | navigate to `route` | Tap behavior |
+| `hold_action` | ActionConfig | `none` | Hold behavior |
+| `double_tap_action` | ActionConfig | `none` | Double-tap behavior |
+
+### ActionConfig
+
+| Key | Type | Description |
+|---|---|---|
+| `action` | string | Action type (see Action Types table) |
+| `entity` | string | Entity override for this action (useful for navbar items) |
+| `navigation_path` | string | Path for `navigate` action |
+| `navigation_replace` | boolean | Use `replaceState` instead of `pushState` |
+| `url_path` | string | URL for `url` action |
+| `perform_action` | string | Service in `domain.service` format for `perform-action` |
+| `data` | object | Service data for `perform-action` |
+| `target` | object | Service target for `perform-action` |
+| `service` | string | Service for `call-service` (legacy) |
+| `service_data` | object | Service data for `call-service` (legacy) |
+| `pipeline_id` | string | Assist pipeline ID |
+| `start_listening` | boolean | Auto-start listening in assist |
+
 ## Glass Styling
 
-All cards share a glassmorphism styling system driven by CSS custom properties. Configure via the visual editor or YAML:
-
-| Config Key | Default | Description |
-|---|---|---|
-| `glass_blur` | `10` | Backdrop blur in px (0-30) |
-| `background_color` | auto | Card background (RGBA recommended) |
-| `border_opacity` | `0.2` | Border visibility (0-1) |
-| `accent_color` | auto | Accent color for active states |
-| `corner_radius` | `16` | Border radius in px (4-32) |
-
-Cards auto-detect dark/light mode and adjust defaults. Explicit config values always override auto-detection.
+All cards share a glassmorphism styling system driven by CSS custom properties. Configure via the visual editor or YAML. Cards auto-detect dark/light mode and adjust defaults. Explicit config values always override auto-detection.
 
 Theme authors can set defaults via HA theme YAML using `--onyx-*` CSS custom properties.
+
+## FAQ
+
+**How long is a hold?** 500ms. The device vibrates (on mobile) at the threshold to confirm the hold registered. The action fires when you release.
+
+**Why does single-tap feel delayed when I configure double-tap?** There is a 250ms window after each tap to detect whether a second tap follows. If you configure `double_tap_action`, single-tap will wait that long before firing. URL actions on tap skip this delay - `window.open` requires a synchronous user event and can't be deferred.
+
+**Why doesn't my URL action work from the editor preview?** Browsers require a direct user gesture to open a new tab. URL actions work correctly from real taps - the editor preview is not a real gesture.
+
+**Can a navbar item open more-info on an entity I'm not navigating to?** Yes. Set `hold_action: { action: more-info, entity: light.bedroom }` on the item. The `entity` field on an action config overrides the card-level entity for that specific action.
+
+**Does keyboard navigation support hold actions?** Yes. Hold Enter for 500ms to trigger a hold action. Space always fires a tap. Keyboard double-tap is not supported (Enter and Space are tap or hold only).
+
+**What is the difference between `perform-action` and `call-service`?** The same thing. Home Assistant renamed the concept in 2024. `perform-action` is the current name. `call-service` still works and is equivalent - useful if you have existing YAML you don't want to rewrite.
 
 ## Installation
 

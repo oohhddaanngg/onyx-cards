@@ -5,8 +5,9 @@ import { OnyxBaseCard } from '../../shared/base-card.js';
 import { cardStyles } from '../../shared/card-styles.js';
 import { glassCardStyles, glassLightDefaults } from '../../shared/glass-styles.js';
 import { registerCustomCard } from '../../utils/register.js';
-import { isRelativePath } from '../../utils/validate.js';
-import { fireEvent, isActive, isAvailable, isToggleable } from '../../ha/types.js';
+import { actionHandler } from '../../utils/action-handler-directive.js';
+import { handleAction } from '../../utils/handle-action.js';
+import { isActive, isAvailable } from '../../ha/types.js';
 import { ENTITY_CARD_NAME, ENTITY_CARD_EDITOR_NAME } from './const.js';
 import { entityCardConfigStruct, type EntityCardConfig } from './entity-card-config.js';
 
@@ -152,9 +153,16 @@ export class OnyxEntityCard extends OnyxBaseCard<EntityCardConfig> {
       <ha-card>
         <div
           class="container"
-          @click=${this._handleTap}
-          @keydown=${this._handleKeydown}
-          @keyup=${this._handleKeyup}
+          ${actionHandler({
+            hasHold:
+              this._config.hold_action?.action !== 'none' &&
+              this._config.hold_action?.action !== undefined,
+            hasDoubleClick:
+              this._config.double_tap_action?.action !== 'none' &&
+              this._config.double_tap_action?.action !== undefined,
+            isTapUrl: this._config.tap_action?.action === 'url',
+          })}
+          @action=${this._handleAction}
           role="button"
           tabindex="0"
           aria-label=${name}
@@ -182,39 +190,10 @@ export class OnyxEntityCard extends OnyxBaseCard<EntityCardConfig> {
     `;
   }
 
-  private _handleKeydown(ev: KeyboardEvent): void {
-    if (ev.key === 'Enter') {
-      ev.preventDefault();
-      if (!ev.repeat) this._handleTap();
-    } else if (ev.key === ' ') {
-      ev.preventDefault();
-    }
-  }
-
-  private _handleKeyup(ev: KeyboardEvent): void {
-    if (ev.key === ' ') {
-      ev.preventDefault();
-      this._handleTap();
-    }
-  }
-
-  private _handleTap(): void {
-    if (!this._config?.entity || !this.hass) return;
-
-    const action = this._config.tap_action?.action ?? 'toggle';
-
-    if (action === 'toggle' && isToggleable(this._config.entity)) {
-      this.hass.callService('homeassistant', 'toggle', {}, { entity_id: this._config.entity });
-    } else if (action === 'navigate' && this._config.tap_action?.navigation_path) {
-      const navPath = this._config.tap_action.navigation_path;
-      if (typeof navPath === 'string' && isRelativePath(navPath)) {
-        history.pushState(null, '', navPath);
-        fireEvent(this, 'location-changed', { replace: false });
-      }
-    } else {
-      fireEvent(this, 'hass-more-info', { entityId: this._config.entity });
-    }
+  private _handleAction(ev: Event): void {
+    if (!this._config || !this.hass) return;
+    const action = (ev as CustomEvent<{ action: 'tap' | 'hold' | 'double_tap' }>).detail.action;
+    handleAction(this, this.hass, this._config, action);
   }
 }
 
-type HomeAssistant = import('../../ha/types.js').HomeAssistant;

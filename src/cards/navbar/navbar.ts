@@ -4,12 +4,12 @@ import { assert } from 'superstruct';
 import { OnyxBaseElement } from '../../shared/base-element.js';
 import { glassLightDefaults } from '../../shared/glass-styles.js';
 import { registerCustomCard } from '../../utils/register.js';
-import { fireEvent } from '../../ha/types.js';
+import type { LovelaceCard, LovelaceGridOptions, ActionableConfig } from '../../ha/types.js';
 import { applyGlassConfig } from '../../utils/theme.js';
-import { isRelativePath } from '../../utils/validate.js';
-import type { LovelaceCard, LovelaceGridOptions } from '../../ha/types.js';
+import { actionHandler } from '../../utils/action-handler-directive.js';
+import { handleAction } from '../../utils/handle-action.js';
 import { NAVBAR_NAME, NAVBAR_EDITOR_NAME } from './const.js';
-import { navbarConfigStruct, type NavbarConfig } from './navbar-config.js';
+import { navbarConfigStruct, type NavbarConfig, type NavItem } from './navbar-config.js';
 
 registerCustomCard({
   type: NAVBAR_NAME,
@@ -157,7 +157,12 @@ export class OnyxNavbar extends OnyxBaseElement implements LovelaceCard {
           (item) => html`
             <button
               class="nav-item ${this._isActive(item.route) ? 'active' : ''}"
-              @click=${() => this._navigate(item.route)}
+              ${actionHandler({
+                hasHold: (item.hold_action?.action ?? 'none') !== 'none',
+                hasDoubleClick: (item.double_tap_action?.action ?? 'none') !== 'none',
+                isTapUrl: item.tap_action?.action === 'url',
+              })}
+              @action=${(ev: Event) => this._handleAction(ev, item)}
               aria-label=${item.label ?? item.route}
             >
               <ha-icon .icon=${item.icon}></ha-icon>
@@ -169,12 +174,15 @@ export class OnyxNavbar extends OnyxBaseElement implements LovelaceCard {
     `;
   }
 
-  private _navigate(path: string): void {
-    if (window.location.pathname === path) return;
-    if (!isRelativePath(path)) return;
-    history.pushState(null, '', path);
-    fireEvent(this, 'location-changed', { replace: false });
-    this._currentPath = path;
+  private _handleAction(ev: Event, item: NavItem): void {
+    if (!this.hass) return;
+    const action = (ev as CustomEvent<{ action: 'tap' | 'hold' | 'double_tap' }>).detail.action;
+    const config: ActionableConfig = {
+      tap_action: item.tap_action ?? { action: 'navigate', navigation_path: item.route },
+      hold_action: item.hold_action ?? { action: 'none' },
+      double_tap_action: item.double_tap_action ?? { action: 'none' },
+    };
+    handleAction(this, this.hass, config, action);
   }
 
   private _isActive(route: string): boolean {

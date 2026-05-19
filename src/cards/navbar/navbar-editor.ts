@@ -29,6 +29,18 @@ const GLASS_LABELS: Record<string, string> = {
   background_color: 'Background Color',
 };
 
+const ITEM_ACTION_SCHEMA = [
+  { name: 'tap_action', selector: { ui_action: {} } },
+  { name: 'hold_action', selector: { ui_action: {} } },
+  { name: 'double_tap_action', selector: { ui_action: {} } },
+];
+
+const ACTION_LABELS: Record<string, string> = {
+  tap_action: 'Tap Action',
+  hold_action: 'Hold Action',
+  double_tap_action: 'Double Tap Action',
+};
+
 @customElement(NAVBAR_EDITOR_NAME)
 export class OnyxNavbarEditor extends OnyxBaseElement implements LovelaceCardEditor {
   @state() private _config?: NavbarConfig;
@@ -74,6 +86,11 @@ export class OnyxNavbarEditor extends OnyxBaseElement implements LovelaceCardEdi
         .nav-item-fields ha-textfield,
         .nav-item-fields ha-icon-picker {
           width: 100%;
+        }
+        .action-fields {
+          border-top: 1px solid var(--divider-color, rgba(255, 255, 255, 0.1));
+          padding-top: 8px;
+          margin-top: 4px;
         }
         .field-row {
           display: flex;
@@ -173,6 +190,15 @@ export class OnyxNavbarEditor extends OnyxBaseElement implements LovelaceCardEdi
                     this._updateItem(index, 'route', (ev.target as HTMLInputElement).value)}
                 ></ha-textfield>
               </div>
+              <div class="action-fields">
+                <ha-form
+                  .hass=${this.hass}
+                  .data=${item}
+                  .schema=${ITEM_ACTION_SCHEMA}
+                  .computeLabel=${this._computeActionLabel}
+                  @value-changed=${(ev: CustomEvent) => this._updateItemActions(index, ev.detail.value)}
+                ></ha-form>
+              </div>
             </div>
             <div class="item-actions">
               ${index > 0
@@ -208,6 +234,12 @@ export class OnyxNavbarEditor extends OnyxBaseElement implements LovelaceCardEdi
         ></ha-form>
       </div>
     `;
+  }
+
+  private _updateItemActions(index: number, value: NavItem): void {
+    const items = [...(this._config!.items ?? [])];
+    items[index] = { ...items[index], ...value };
+    this._fireConfig({ ...this._config!, items });
   }
 
   private _updateItem(index: number, field: keyof NavItem, value: string): void {
@@ -249,5 +281,9 @@ export class OnyxNavbarEditor extends OnyxBaseElement implements LovelaceCardEdi
 
   private _computeLabel = (schema: { name: string }): string => {
     return GLASS_LABELS[schema.name] ?? schema.name;
+  };
+
+  private _computeActionLabel = (schema: { name: string }): string => {
+    return ACTION_LABELS[schema.name] ?? schema.name;
   };
 }

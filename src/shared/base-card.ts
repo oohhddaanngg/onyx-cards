@@ -26,6 +26,7 @@ export abstract class OnyxBaseCard<T extends LovelaceCardConfig>
     this._config = {
       tap_action: { action: 'toggle' },
       hold_action: { action: 'more-info' },
+      double_tap_action: { action: 'none' },
       show_state: true,
       ...config,
     };

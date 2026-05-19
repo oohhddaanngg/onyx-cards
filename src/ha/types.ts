@@ -9,7 +9,13 @@ export interface HomeAssistant {
     domain: string,
     service: string,
     serviceData?: Record<string, unknown>,
-    target?: { entity_id?: string | string[] }
+    target?: {
+      entity_id?: string | string[];
+      area_id?: string | string[];
+      device_id?: string | string[];
+      floor_id?: string | string[];
+      label_id?: string | string[];
+    }
   ) => Promise<void>;
   formatEntityState: (stateObj: HassEntity) => string;
   formatEntityAttributeValue: (stateObj: HassEntity, attribute: string) => string;
@@ -50,12 +56,33 @@ export interface LovelaceGridOptions {
 }
 
 export interface ActionConfig {
-  action: 'none' | 'toggle' | 'more-info' | 'navigate' | 'url' | 'call-service';
+  action:
+    | 'none'
+    | 'toggle'
+    | 'more-info'
+    | 'navigate'
+    | 'url'
+    | 'perform-action'
+    | 'call-service'
+    | 'assist';
+  entity?: string;
   navigation_path?: string;
+  navigation_replace?: boolean;
   url_path?: string;
+  perform_action?: string;
+  data?: Record<string, unknown>;
   service?: string;
   service_data?: Record<string, unknown>;
   target?: Record<string, unknown>;
+  pipeline_id?: string;
+  start_listening?: boolean;
+}
+
+export interface ActionableConfig {
+  entity?: string;
+  tap_action?: ActionConfig;
+  hold_action?: ActionConfig;
+  double_tap_action?: ActionConfig;
 }
 
 export function fireEvent(

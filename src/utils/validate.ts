@@ -26,3 +26,12 @@ export function isRelativePath(path: string): boolean {
   if (CONTROL_CHARS.test(path)) return false;
   return true;
 }
+
+export function isSafeUrl(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
