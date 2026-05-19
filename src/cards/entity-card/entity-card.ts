@@ -27,8 +27,12 @@ export class OnyxEntityCard extends OnyxBaseCard<EntityCardConfig> {
       css`
         .container {
           flex: 1;
-          display: flex;
+          min-height: 100%;
+          box-sizing: border-box;
+          display: grid;
+          grid-template-columns: auto 1fr;
           align-items: center;
+          align-content: center;
           padding: 12px 16px;
           gap: 12px;
           cursor: pointer;
