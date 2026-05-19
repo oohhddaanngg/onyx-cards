@@ -10,7 +10,7 @@ export interface ActionHandlerOptions {
 }
 
 class ActionHandlerDirective extends AsyncDirective {
-  private _element?: Element;
+  private _element?: HTMLElement;
   private _options: ActionHandlerOptions = {};
 
   private _pendingTap = false;
@@ -20,6 +20,7 @@ class ActionHandlerDirective extends AsyncDirective {
   private _activePointerId: number | null = null;
   private _startX = 0;
   private _startY = 0;
+  private _lastPointerUpMs = 0;
 
   private _holdTimer?: ReturnType<typeof setTimeout>;
   private _doubleTapTimer?: ReturnType<typeof setTimeout>;
@@ -31,38 +32,42 @@ class ActionHandlerDirective extends AsyncDirective {
     }
   }
 
-  render(): typeof noChange {
+  render(_options?: ActionHandlerOptions): typeof noChange {
+    void _options;
     return noChange;
   }
 
   update(part: ElementPart, [options]: [ActionHandlerOptions]): typeof noChange {
     this._options = options ?? {};
-    if (this._element !== part.element) {
+    const el = part.element as HTMLElement;
+    if (this._element !== el) {
       if (this._element) this._removeListeners(this._element);
-      this._element = part.element;
+      this._element = el;
       this._bindListeners(this._element);
     }
     return noChange;
   }
 
-  private _bindListeners(el: Element): void {
+  private _bindListeners(el: HTMLElement): void {
     el.addEventListener('pointerdown', this._onPointerDown);
     el.addEventListener('pointerup', this._onPointerUp);
     el.addEventListener('pointermove', this._onPointerMove);
     el.addEventListener('pointercancel', this._onPointerCancel);
     el.addEventListener('lostpointercapture', this._onLostPointerCapture);
+    el.addEventListener('click', this._onClick);
     el.addEventListener('contextmenu', this._onContextMenu, { passive: false });
     el.addEventListener('keydown', this._onKeyDown, { passive: false });
     el.addEventListener('keyup', this._onKeyUp, { passive: false });
     el.addEventListener('blur', this._onBlur);
   }
 
-  private _removeListeners(el: Element): void {
+  private _removeListeners(el: HTMLElement): void {
     el.removeEventListener('pointerdown', this._onPointerDown);
     el.removeEventListener('pointerup', this._onPointerUp);
     el.removeEventListener('pointermove', this._onPointerMove);
     el.removeEventListener('pointercancel', this._onPointerCancel);
     el.removeEventListener('lostpointercapture', this._onLostPointerCapture);
+    el.removeEventListener('click', this._onClick);
     el.removeEventListener('contextmenu', this._onContextMenu);
     el.removeEventListener('keydown', this._onKeyDown);
     el.removeEventListener('keyup', this._onKeyUp);
@@ -83,7 +88,7 @@ class ActionHandlerDirective extends AsyncDirective {
 
   private _fireAction(actionType: 'tap' | 'hold' | 'double_tap'): void {
     if (this._element) {
-      fireEvent(this._element as HTMLElement, 'action', { action: actionType });
+      fireEvent(this._element, 'action', { action: actionType });
     }
   }
 
@@ -122,6 +127,7 @@ class ActionHandlerDirective extends AsyncDirective {
 
     // Clear before releasePointerCapture so lostpointercapture sees null and ignores it
     this._activePointerId = null;
+    this._lastPointerUpMs = Date.now();
     this._element!.releasePointerCapture(ev.pointerId);
 
     if (this._canceled) {
@@ -192,6 +198,12 @@ class ActionHandlerDirective extends AsyncDirective {
       this._holdTimer = undefined;
       this._activePointerId = null;
     }
+  };
+
+  // Fallback for AT (screen readers that synthesize click without pointer events)
+  private _onClick = (): void => {
+    if (Date.now() - this._lastPointerUpMs < 300) return; // already handled by pointer events
+    if (!this._canceled) this._fireAction('tap');
   };
 
   private _onContextMenu = (ev: MouseEvent): void => {

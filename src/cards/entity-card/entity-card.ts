@@ -7,7 +7,7 @@ import { glassCardStyles, glassLightDefaults } from '../../shared/glass-styles.j
 import { registerCustomCard } from '../../utils/register.js';
 import { actionHandler } from '../../utils/action-handler-directive.js';
 import { handleAction } from '../../utils/handle-action.js';
-import { isActive, isAvailable } from '../../ha/types.js';
+import { isActive, isAvailable, type HomeAssistant } from '../../ha/types.js';
 import { ENTITY_CARD_NAME, ENTITY_CARD_EDITOR_NAME } from './const.js';
 import { entityCardConfigStruct, type EntityCardConfig } from './entity-card-config.js';
 

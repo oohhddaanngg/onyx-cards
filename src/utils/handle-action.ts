@@ -97,16 +97,9 @@ export function handleAction(
       break;
     }
 
-    case 'assist': {
-      const slotName =
-        actionType === 'tap'
-          ? 'tap_action'
-          : actionType === 'hold'
-            ? 'hold_action'
-            : 'double_tap_action';
-      fireEvent(element, 'hass-action', { config, action: slotName });
+    case 'assist':
+      fireEvent(element, 'hass-action', { config, action: actionType });
       break;
-    }
   }
 }
 
