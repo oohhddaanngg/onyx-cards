@@ -266,6 +266,17 @@ npm run dev      # watch mode
 
 Built with Lit 3, TypeScript, and Vite. Output is a single ES module bundle at `dist/onyx-cards.js`.
 
+### Testing
+
+```sh
+npm run test:run      # run all tests once
+npm test              # watch mode (interactive dev, not for CI)
+npm run test:coverage # run with v8 coverage report
+npm run typecheck     # type-check all source and test files
+```
+
+Tests use Vitest with happy-dom. Test files are colocated with source as `*.test.ts`.
+
 ## License
 
 MIT

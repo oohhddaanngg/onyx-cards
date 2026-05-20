@@ -7,7 +7,11 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
-    "lint": "eslint src --max-warnings 0"
+    "lint": "eslint src --max-warnings 0",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "home-assistant-js-websocket": "^9.6.0",
@@ -15,13 +19,16 @@
     "superstruct": "^2.0.2"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "^4.1.6",
     "eslint": "^10.4.0",
     "eslint-plugin-lit": "^2.3.1",
     "eslint-plugin-lit-a11y": "^5.1.1",
     "eslint-plugin-wc": "^3.1.0",
+    "happy-dom": "^20.9.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.4",
-    "vite": "^8.0.13"
+    "vite": "^8.0.13",
+    "vitest": "^4.1.6"
   },
   "license": "MIT",
   "repository": {
