@@ -8,6 +8,23 @@ import { isVersionAtLeast, MIN_VERSION_EXPANDABLE } from '../../utils/version.js
 import { ENTITY_CARD_EDITOR_NAME } from './const.js';
 import type { EntityCardConfig } from './entity-card-config.js';
 
+const FLAT_GLASS_SCHEMA: HaFormSchema[] = [
+  {
+    name: 'glass_blur',
+    selector: { number: { min: 0, max: 30, step: 1, mode: 'slider', unit_of_measurement: 'px' } },
+  },
+  {
+    name: 'border_opacity',
+    selector: { number: { min: 0, max: 1, step: 0.05, mode: 'slider' } },
+  },
+  {
+    name: 'corner_radius',
+    selector: { number: { min: 4, max: 32, step: 1, mode: 'slider', unit_of_measurement: 'px' } },
+  },
+  { name: 'accent_color', selector: { ui_color: {} } },
+  { name: 'background_color', selector: { ui_color: {} } },
+];
+
 const SCHEMA: HaFormSchema[] = [
   { name: 'entity', selector: { entity: {} } },
   { name: 'name', selector: { text: {} } },
@@ -26,43 +43,11 @@ const SCHEMA: HaFormSchema[] = [
     name: '',
     title: 'Glass Styling',
     icon: 'mdi:blur',
-    schema: [
-      {
-        name: 'glass_blur',
-        selector: { number: { min: 0, max: 30, step: 1, mode: 'slider', unit_of_measurement: 'px' } },
-      },
-      {
-        name: 'border_opacity',
-        selector: { number: { min: 0, max: 1, step: 0.05, mode: 'slider' } },
-      },
-      {
-        name: 'corner_radius',
-        selector: { number: { min: 4, max: 32, step: 1, mode: 'slider', unit_of_measurement: 'px' } },
-      },
-      { name: 'accent_color', selector: { ui_color: {} } },
-      { name: 'background_color', selector: { ui_color: {} } },
-    ],
+    schema: FLAT_GLASS_SCHEMA,
   },
   { name: 'tap_action', selector: { ui_action: {} } },
   { name: 'hold_action', selector: { ui_action: {} } },
   { name: 'double_tap_action', selector: { ui_action: {} } },
-];
-
-const FLAT_GLASS_SCHEMA: HaFormSchema[] = [
-  {
-    name: 'glass_blur',
-    selector: { number: { min: 0, max: 30, step: 1, mode: 'slider', unit_of_measurement: 'px' } },
-  },
-  {
-    name: 'border_opacity',
-    selector: { number: { min: 0, max: 1, step: 0.05, mode: 'slider' } },
-  },
-  {
-    name: 'corner_radius',
-    selector: { number: { min: 4, max: 32, step: 1, mode: 'slider', unit_of_measurement: 'px' } },
-  },
-  { name: 'accent_color', selector: { ui_color: {} } },
-  { name: 'background_color', selector: { ui_color: {} } },
 ];
 
 const SCHEMA_FALLBACK: HaFormSchema[] = [

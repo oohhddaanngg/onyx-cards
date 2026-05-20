@@ -69,6 +69,14 @@ describe('isVersionAtLeast', () => {
   it('handles HA dotted dev version format', () => {
     expect(isVersionAtLeast('2026.6.0.dev202605170318', [2022, 11, 0])).toBe(true);
   });
+
+  it('rejects non-digit characters in major segment', () => {
+    expect(isVersionAtLeast('2022x.11.0', [2022, 11, 0])).toBe(false);
+  });
+
+  it('rejects non-digit characters in minor segment', () => {
+    expect(isVersionAtLeast('2022.11x.0', [2022, 11, 0])).toBe(false);
+  });
 });
 
 describe('MIN_VERSION_EXPANDABLE', () => {
