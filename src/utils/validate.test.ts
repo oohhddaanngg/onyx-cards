@@ -46,19 +46,25 @@ describe('isValidCssColor', () => {
     expect(isValidCssColor('#ff00aa80')).toBe(true);
   });
 
-  it('rejects value with backslash injection', () => {
+  // Stub CSS.supports to return true so these tests only fail due to the
+  // explicit prefilters, not because the hex regex incidentally rejects them.
+  it('rejects value with backslash injection (prefilter)', () => {
+    vi.stubGlobal('CSS', { supports: vi.fn(() => true) });
     expect(isValidCssColor('red\\;background:url(evil)')).toBe(false);
   });
 
-  it('rejects var() function', () => {
+  it('rejects var() function (prefilter)', () => {
+    vi.stubGlobal('CSS', { supports: vi.fn(() => true) });
     expect(isValidCssColor('var(--evil)')).toBe(false);
   });
 
-  it('rejects url() function', () => {
+  it('rejects url() function (prefilter)', () => {
+    vi.stubGlobal('CSS', { supports: vi.fn(() => true) });
     expect(isValidCssColor('url(http://evil.com)')).toBe(false);
   });
 
-  it('rejects env() function', () => {
+  it('rejects env() function (prefilter)', () => {
+    vi.stubGlobal('CSS', { supports: vi.fn(() => true) });
     expect(isValidCssColor('env(EVIL)')).toBe(false);
   });
 
