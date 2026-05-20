@@ -11,7 +11,7 @@ export function isVersionAtLeast(
   minimum: [number, number, number]
 ): boolean {
   if (!version) return false;
-  const parts = version.split('.').map((p) => parseInt(p, 10));
+  const parts = version.split('.').slice(0, 3).map((p) => parseInt(p, 10));
   if (parts.length < 2 || parts.some((p) => !Number.isFinite(p) || p < 0)) return false;
   const [major, minor, patch = 0] = parts;
   const [minMajor, minMinor, minPatch] = minimum;
