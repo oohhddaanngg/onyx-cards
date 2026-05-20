@@ -214,6 +214,8 @@ Theme authors can set defaults via HA theme YAML using `--onyx-*` CSS custom pro
 
 **Can a navbar item open more-info on an entity I'm not navigating to?** Yes. Set `hold_action: { action: more-info, entity: light.bedroom }` on the item. The `entity` field on an action config overrides the card-level entity for that specific action.
 
+**Can I edit the navbar in the visual editor?** Yes. In dashboard edit mode, the navbar switches from fixed-bottom positioning to an inline preview in its grid slot. Click Edit on the card's action controls to open the visual editor. The bar returns to its fixed position when you exit edit mode.
+
 **Does keyboard navigation support hold actions?** Yes. Hold Enter for 500ms to trigger a hold action. Space always fires a tap. Keyboard double-tap is not supported (Enter and Space are tap or hold only).
 
 **What is the difference between `perform-action` and `call-service`?** The same thing. Home Assistant renamed the concept in 2024. `perform-action` is the current name. `call-service` still works and is equivalent - useful if you have existing YAML you don't want to rewrite.

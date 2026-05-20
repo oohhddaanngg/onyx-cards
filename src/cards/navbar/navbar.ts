@@ -1,5 +1,5 @@
 import { html, nothing, css, type CSSResultGroup, type TemplateResult } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { assert } from 'superstruct';
 import { OnyxBaseElement } from '../../shared/base-element.js';
 import { glassLightDefaults } from '../../shared/glass-styles.js';
@@ -20,8 +20,24 @@ registerCustomCard({
 
 @customElement(NAVBAR_NAME)
 export class OnyxNavbar extends OnyxBaseElement implements LovelaceCard {
+  @property({ type: Boolean }) public preview = false;
+  @property({ type: Boolean }) public editMode = false;
+
   @state() private _config?: NavbarConfig;
   @state() private _currentPath = '';
+
+  private get _inEditMode(): boolean {
+    if (this.preview || this.editMode) return true;
+    if (this.closest('hui-card-options, hui-card-edit-mode') !== null) return true;
+    const root = this.getRootNode();
+    if (
+      root instanceof ShadowRoot &&
+      (root.host as HTMLElement | null)?.tagName === 'HUI-CARD-PICKER'
+    ) {
+      return true;
+    }
+    return false;
+  }
 
   static get styles(): CSSResultGroup {
     return [
@@ -89,6 +105,24 @@ export class OnyxNavbar extends OnyxBaseElement implements LovelaceCard {
         :host([light-mode]) .nav-item.active {
           background: rgba(0, 0, 0, 0.06);
         }
+        :host([edit-mode]) .navbar {
+          position: relative;
+          left: auto;
+          right: auto;
+          bottom: auto;
+          z-index: auto;
+          padding: 4px 8px;
+          box-shadow: none;
+          border-top: none;
+          border-radius: var(--ha-card-border-radius, 12px);
+        }
+        :host([edit-mode]) .nav-item {
+          pointer-events: none;
+          padding: 4px 8px;
+        }
+        :host([edit-mode]) .nav-item .label {
+          display: none;
+        }
       `,
     ];
   }
@@ -98,6 +132,7 @@ export class OnyxNavbar extends OnyxBaseElement implements LovelaceCard {
     this._currentPath = window.location.pathname;
     window.addEventListener('popstate', this._onLocationChange);
     window.addEventListener('location-changed', this._onLocationChange);
+    this.requestUpdate();
   }
 
   disconnectedCallback(): void {
@@ -144,37 +179,58 @@ export class OnyxNavbar extends OnyxBaseElement implements LovelaceCard {
     if (this._config) {
       applyGlassConfig(this, this._config as unknown as Record<string, unknown>);
     }
+    const inEdit = this._inEditMode;
+    if (inEdit) {
+      this.setAttribute('edit-mode', '');
+    } else {
+      this.removeAttribute('edit-mode');
+    }
   }
 
   protected render(): TemplateResult {
     if (!this._config) return html``;
 
     const items = this._config.items ?? [];
+    const inEdit = this._inEditMode;
 
     return html`
-      <nav class="navbar">
-        ${items.map(
-          (item) => html`
-            <button
-              class="nav-item ${this._isActive(item.route) ? 'active' : ''}"
-              ${actionHandler({
-                hasHold: (item.hold_action?.action ?? 'none') !== 'none',
-                hasDoubleClick: (item.double_tap_action?.action ?? 'none') !== 'none',
-                isTapUrl: item.tap_action?.action === 'url',
-              })}
-              @action=${(ev: Event) => this._handleAction(ev, item)}
-              aria-label=${item.label ?? item.route}
-            >
-              <ha-icon .icon=${item.icon}></ha-icon>
-              ${item.label ? html`<span class="label">${item.label}</span>` : nothing}
-            </button>
-          `
+      <nav class="navbar" aria-hidden=${inEdit ? 'true' : nothing}>
+        ${items.map((item) =>
+          inEdit ? this._renderItemStatic(item) : this._renderItemInteractive(item)
         )}
       </nav>
     `;
   }
 
+  private _renderItemStatic(item: NavItem): TemplateResult {
+    return html`
+      <div class="nav-item ${this._isActive(item.route) ? 'active' : ''}">
+        <ha-icon .icon=${item.icon}></ha-icon>
+        ${item.label ? html`<span class="label">${item.label}</span>` : nothing}
+      </div>
+    `;
+  }
+
+  private _renderItemInteractive(item: NavItem): TemplateResult {
+    return html`
+      <button
+        class="nav-item ${this._isActive(item.route) ? 'active' : ''}"
+        ${actionHandler({
+          hasHold: (item.hold_action?.action ?? 'none') !== 'none',
+          hasDoubleClick: (item.double_tap_action?.action ?? 'none') !== 'none',
+          isTapUrl: item.tap_action?.action === 'url',
+        })}
+        @action=${(ev: Event) => this._handleAction(ev, item)}
+        aria-label=${item.label ?? item.route}
+      >
+        <ha-icon .icon=${item.icon}></ha-icon>
+        ${item.label ? html`<span class="label">${item.label}</span>` : nothing}
+      </button>
+    `;
+  }
+
   private _handleAction(ev: Event, item: NavItem): void {
+    if (this._inEditMode) return;
     if (!this.hass) return;
     const action = (ev as CustomEvent<{ action: 'tap' | 'hold' | 'double_tap' }>).detail.action;
     const config: ActionableConfig = {
