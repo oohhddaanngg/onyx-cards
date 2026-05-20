@@ -10,7 +10,7 @@ Every existing card library makes you choose: look good (Nodalia, Prism) but bre
 
 ### Entity Card (`custom:onyx-entity-card`)
 
-Handles switches, input_booleans, sensors, lights, locks, fans, and automations. Tap to toggle switchable entities, tap for more-info on sensors.
+Works with any entity. Tap toggles switches, input_booleans, lights, fans, automations, and scripts. All other domains - sensors, locks, covers, etc. - open more-info on tap.
 
 ```yaml
 type: custom:onyx-entity-card
@@ -198,9 +198,26 @@ The core differentiator. Onyx cards return dynamic `getGridOptions()` based on c
 
 ## Glass Styling
 
-All cards share a glassmorphism styling system driven by CSS custom properties. Configure via the visual editor or YAML. Cards auto-detect dark/light mode and adjust defaults. Explicit config values always override auto-detection.
+All cards share a glassmorphism styling system driven by CSS custom properties. Configure via the visual editor or YAML. Cards read `hass.themes.darkMode` and adjust all color defaults automatically. Explicit config values always override auto-detection.
 
-Theme authors can set defaults via HA theme YAML using `--onyx-*` CSS custom properties.
+Theme authors can set defaults via HA theme YAML:
+
+| Property | Default (dark) | Description |
+|---|---|---|
+| `--onyx-glass-blur` | `10px` | Backdrop blur intensity |
+| `--onyx-bg-color` | `rgba(0, 0, 0, 0.4)` | Card background color |
+| `--onyx-border-color` | `rgba(255, 255, 255, 0.2)` | Border color |
+| `--onyx-border-opacity` | `0.2` | Border opacity |
+| `--onyx-accent-color` | HA `--primary-color` | Active state accent |
+| `--onyx-text-primary` | `rgba(255, 255, 255, 0.95)` | Primary text color |
+| `--onyx-text-secondary` | `rgba(255, 255, 255, 0.6)` | Secondary text color |
+| `--onyx-icon-active` | `rgba(255, 255, 255, 0.9)` | Active icon color |
+| `--onyx-icon-inactive` | `rgba(255, 255, 255, 0.4)` | Inactive icon color |
+| `--onyx-radius` | `16px` | Corner radius |
+| `--onyx-transition` | `0.3s cubic-bezier(0.4, 0, 0.2, 1)` | Transition timing |
+| `--onyx-glow-color` | `rgba(255, 255, 255, 0.08)` | Inner highlight glow |
+
+All properties switch to appropriate light-mode defaults automatically.
 
 ## FAQ
 
@@ -228,9 +245,14 @@ Theme authors can set defaults via HA theme YAML using `--onyx-*` CSS custom pro
 2. Copy to `/config/www/onyx-cards.js`
 3. Add as a Lovelace resource: Settings > Dashboards > Resources > Add `/local/onyx-cards.js` (JavaScript Module)
 
-### HACS (coming soon)
+### HACS (custom repository)
 
-Will be available through HACS once the project is public.
+1. Open HACS in Home Assistant
+2. Click the three-dot menu (top right) and select "Custom repositories"
+3. Add `https://github.com/oohhddaanngg/onyx-cards` with category "Dashboard"
+4. Search for "Onyx Cards" in the HACS Frontend store and install
+5. Restart Home Assistant
+6. Add the resource if HACS does not do it automatically: Settings > Dashboards > Resources > Add `/hacsfiles/onyx-cards/onyx-cards.js` (JavaScript Module)
 
 ## Development
 
