@@ -1,10 +1,22 @@
-import type { HassEntity, HassServices } from 'home-assistant-js-websocket';
+import type { HassConfig, HassEntity, HassServices } from 'home-assistant-js-websocket';
 
 export type { HassEntity } from 'home-assistant-js-websocket';
+
+export interface HaFormSchema {
+  name: string;
+  selector?: Record<string, unknown>;
+  type?: string;
+  schema?: HaFormSchema[];
+  title?: string;
+  icon?: string;
+  context?: Record<string, string>;
+  flatten?: boolean;
+}
 
 export interface HomeAssistant {
   states: Record<string, HassEntity>;
   services: HassServices;
+  config: HassConfig;
   callService: (
     domain: string,
     service: string,

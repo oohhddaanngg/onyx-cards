@@ -1,21 +1,12 @@
-import { html, nothing, type CSSResultGroup, css, type TemplateResult } from 'lit';
+import { html, nothing, type CSSResultGroup, css, type TemplateResult, type PropertyValues } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { OnyxBaseElement } from '../../shared/base-element.js';
 import { fireEvent } from '../../ha/types.js';
-import type { LovelaceCardEditor } from '../../ha/types.js';
+import type { LovelaceCardEditor, HaFormSchema } from '../../ha/types.js';
 import { loadHaComponents } from '../../utils/loader.js';
+import { isVersionAtLeast, MIN_VERSION_EXPANDABLE } from '../../utils/version.js';
 import { ENTITY_CARD_EDITOR_NAME } from './const.js';
 import type { EntityCardConfig } from './entity-card-config.js';
-
-interface HaFormSchema {
-  name: string;
-  selector?: Record<string, unknown>;
-  type?: string;
-  schema?: HaFormSchema[];
-  title?: string;
-  icon?: string;
-  context?: Record<string, string>;
-}
 
 const SCHEMA: HaFormSchema[] = [
   { name: 'entity', selector: { entity: {} } },
@@ -120,13 +111,13 @@ export class OnyxEntityCardEditor extends OnyxBaseElement implements LovelaceCar
   connectedCallback(): void {
     super.connectedCallback();
     loadHaComponents();
-    this._checkExpandableSupport();
   }
 
-  private _checkExpandableSupport(): void {
-    // Expandable sections were added in HA 2024.x — check if the form renders without error
-    // Default to true; if rendering fails, we'll fall back
-    this._useExpandable = true;
+  protected willUpdate(changedProps: PropertyValues): void {
+    super.willUpdate(changedProps);
+    if (changedProps.has('hass') && this.hass) {
+      this._useExpandable = isVersionAtLeast(this.hass.config?.version, MIN_VERSION_EXPANDABLE);
+    }
   }
 
   static get styles(): CSSResultGroup {

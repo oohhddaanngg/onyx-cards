@@ -1,13 +1,14 @@
-import { html, nothing, css, type CSSResultGroup, type TemplateResult } from 'lit';
+import { html, nothing, css, type CSSResultGroup, type TemplateResult, type PropertyValues } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { OnyxBaseElement } from '../../shared/base-element.js';
 import { fireEvent } from '../../ha/types.js';
-import type { LovelaceCardEditor } from '../../ha/types.js';
+import type { LovelaceCardEditor, HaFormSchema } from '../../ha/types.js';
 import { loadHaComponents } from '../../utils/loader.js';
+import { isVersionAtLeast, MIN_VERSION_EXPANDABLE } from '../../utils/version.js';
 import { NAVBAR_EDITOR_NAME } from './const.js';
 import type { NavbarConfig, NavItem } from './navbar-config.js';
 
-const GLASS_SCHEMA = [
+const FLAT_GLASS_SCHEMA: HaFormSchema[] = [
   {
     name: 'glass_blur',
     selector: {
@@ -20,6 +21,16 @@ const GLASS_SCHEMA = [
   },
   { name: 'accent_color', selector: { ui_color: {} } },
   { name: 'background_color', selector: { ui_color: {} } },
+];
+
+const EXPANDABLE_GLASS_SCHEMA: HaFormSchema[] = [
+  {
+    type: 'expandable',
+    name: '',
+    title: 'Glass Styling',
+    icon: 'mdi:blur',
+    schema: FLAT_GLASS_SCHEMA,
+  },
 ];
 
 const GLASS_LABELS: Record<string, string> = {
@@ -44,12 +55,20 @@ const ACTION_LABELS: Record<string, string> = {
 @customElement(NAVBAR_EDITOR_NAME)
 export class OnyxNavbarEditor extends OnyxBaseElement implements LovelaceCardEditor {
   @state() private _config?: NavbarConfig;
+  @state() private _useExpandable = true;
 
   lovelace?: Record<string, unknown>;
 
   connectedCallback(): void {
     super.connectedCallback();
     loadHaComponents();
+  }
+
+  protected willUpdate(changedProps: PropertyValues): void {
+    super.willUpdate(changedProps);
+    if (changedProps.has('hass') && this.hass) {
+      this._useExpandable = isVersionAtLeast(this.hass.config?.version, MIN_VERSION_EXPANDABLE);
+    }
   }
 
   static get styles(): CSSResultGroup {
@@ -228,7 +247,7 @@ export class OnyxNavbarEditor extends OnyxBaseElement implements LovelaceCardEdi
         <ha-form
           .hass=${this.hass}
           .data=${this._config}
-          .schema=${GLASS_SCHEMA}
+          .schema=${this._useExpandable ? EXPANDABLE_GLASS_SCHEMA : FLAT_GLASS_SCHEMA}
           .computeLabel=${this._computeLabel}
           @value-changed=${this._glassChanged}
         ></ha-form>
